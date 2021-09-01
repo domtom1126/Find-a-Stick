@@ -30,59 +30,57 @@ class _CarListState extends State<CarList> {
   @override
   Widget build(BuildContext context) {
     return Material(
-        child: Row(children: [
-      Scaffold(
-          appBar: AppBar(
-            title: Text('Car List'),
-          ),
-          body: _children[_selectedIndex]
-              child: ListViewCars()),
-          bottomNavigationBar: BottomNavigationBar(
-            onTap: _onItemTap,
-            currentIndex: _selectedIndex,
-            items: [
-              new BottomNavigationBarItem(
-                icon: Icon(Icons.hdr_plus),
-                label: 'Cars',
-              ),
-              new BottomNavigationBarItem(
-                icon: Icon(Icons.message_sharp),
-                label: 'Messages',
-              ),
-              new BottomNavigationBarItem(
-                  icon: Icon(Icons.person), label: 'Profile')
-            ],
-          ))
-    ]));
+        child: Container(
+            child: Scaffold(
+                appBar: AppBar(
+                  title: Text('Car List'),
+                ),
+                body: Container(child: ListViewCars()),
+                bottomNavigationBar: BottomNavigationBar(
+                  onTap: _onItemTap,
+                  currentIndex: _selectedIndex,
+                  items: [
+                    new BottomNavigationBarItem(
+                      icon: Icon(Icons.hdr_plus),
+                      label: 'Cars',
+                    ),
+                    new BottomNavigationBarItem(
+                      icon: Icon(Icons.message_sharp),
+                      label: 'Messages',
+                    ),
+                    new BottomNavigationBarItem(
+                        icon: Icon(Icons.person), label: 'Profile')
+                  ],
+                ))));
   }
 }
 
-// todo Make seperate class of this
-GridView.count(
-            crossAxisCount: 1,
-            children: List.generate(100, (index) {
-              return Column(
-                children: [
-                  //  ? Scrollable gallery click to expand
-                  Row(
-                    children: [Text('gallery of car here')],
-                  ),
-                  Row(
-                    children: [
-                      IconButton(onPressed: null, icon: Icon(Icons.favorite)),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Text('Year ',
-                          style: TextStyle(fontWeight: FontWeight.bold)),
-                      Text('Brand ',
-                          style: TextStyle(fontWeight: FontWeight.bold)),
-                      Text('Price '),
-                      Text('Miles'),
-                    ],
-                  ),
-                ],
-              );
-            }),
-          )
+// // todo Make seperate class of this
+// GridView.count(
+//             crossAxisCount: 1,
+//             children: List.generate(100, (index) {
+//               return Column(
+//                 children: [
+//                   //  ? Scrollable gallery click to expand
+//                   Row(
+//                     children: [Text('gallery of car here')],
+//                   ),
+//                   Row(
+//                     children: [
+//                       IconButton(onPressed: null, icon: Icon(Icons.favorite)),
+//                     ],
+//                   ),
+//                   Row(
+//                     children: [
+//                       Text('Year ',
+//                           style: TextStyle(fontWeight: FontWeight.bold)),
+//                       Text('Brand ',
+//                           style: TextStyle(fontWeight: FontWeight.bold)),
+//                       Text('Price '),
+//                       Text('Miles'),
+//                     ],
+//                   ),
+//                 ],
+//               );
+//             }),
+//           )

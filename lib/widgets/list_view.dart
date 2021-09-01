@@ -1,3 +1,6 @@
+import 'package:find_stick/screens/liked_screen.dart';
+import 'package:find_stick/screens/post_screen.dart';
+import 'package:find_stick/screens/profile_screen.dart';
 import 'package:flutter/material.dart';
 
 class ListViewCars extends StatefulWidget {
