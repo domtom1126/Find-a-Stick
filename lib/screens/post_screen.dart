@@ -11,7 +11,18 @@ class _PostScreenState extends State<PostScreen> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: Text('post screen'),
+      child: Row(
+        children: [
+          Expanded(
+            child: SizedBox(
+              child: TextField(
+                  decoration: InputDecoration(
+                hintText: 'Enter name',
+              )),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -1,4 +1,6 @@
+// Appears after auth screen, basically the home screeen
 import 'package:find_stick/screens/liked_screen.dart';
+import 'package:find_stick/screens/messages_screen.dart';
 import 'package:find_stick/screens/post_screen.dart';
 import 'package:find_stick/screens/profile_screen.dart';
 import 'package:find_stick/widgets/list_view.dart';
@@ -15,10 +17,10 @@ class CarList extends StatefulWidget {
 class _CarListState extends State<CarList> {
   int _selectedIndex = 0;
   final List<Widget> _children = [
-    // HomeScreen(),
-    PostScreen(),
-    LikedScreen(),
-    ProfileScreen(),
+    Container(child: ListViewCars()),
+    Container(child: PostScreen()),
+    Container(child: Text('chat')),
+    Container(child: Text('profile')),
   ];
 
   void _onItemTap(int index) {
@@ -30,57 +32,38 @@ class _CarListState extends State<CarList> {
   @override
   Widget build(BuildContext context) {
     return Material(
-        child: Container(
-            child: Scaffold(
-                appBar: AppBar(
-                  title: Text('Car List'),
-                ),
-                body: Container(child: ListViewCars()),
-                bottomNavigationBar: BottomNavigationBar(
-                  onTap: _onItemTap,
-                  currentIndex: _selectedIndex,
-                  items: [
-                    new BottomNavigationBarItem(
-                      icon: Icon(Icons.hdr_plus),
-                      label: 'Cars',
-                    ),
-                    new BottomNavigationBarItem(
-                      icon: Icon(Icons.message_sharp),
-                      label: 'Messages',
-                    ),
-                    new BottomNavigationBarItem(
-                        icon: Icon(Icons.person), label: 'Profile')
-                  ],
-                ))));
+      child: Container(
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text('Car List'),
+            // todo navigate to messages page
+            actions: [IconButton(onPressed: null, icon: Icon(Icons.message))],
+          ),
+          body: _children[_selectedIndex],
+          bottomNavigationBar: BottomNavigationBar(
+            type: BottomNavigationBarType.fixed,
+            backgroundColor: Colors.blueGrey,
+            onTap: _onItemTap,
+            currentIndex: _selectedIndex,
+            items: [
+              new BottomNavigationBarItem(
+                icon: Icon(Icons.hdr_plus),
+                label: 'Cars',
+              ),
+              new BottomNavigationBarItem(
+                icon: Icon(Icons.hdr_plus),
+                label: 'Post',
+              ),
+              new BottomNavigationBarItem(
+                icon: Icon(Icons.message_sharp),
+                label: 'Liked',
+              ),
+              new BottomNavigationBarItem(
+                  icon: Icon(Icons.person), label: 'Profile')
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
-
-// // todo Make seperate class of this
-// GridView.count(
-//             crossAxisCount: 1,
-//             children: List.generate(100, (index) {
-//               return Column(
-//                 children: [
-//                   //  ? Scrollable gallery click to expand
-//                   Row(
-//                     children: [Text('gallery of car here')],
-//                   ),
-//                   Row(
-//                     children: [
-//                       IconButton(onPressed: null, icon: Icon(Icons.favorite)),
-//                     ],
-//                   ),
-//                   Row(
-//                     children: [
-//                       Text('Year ',
-//                           style: TextStyle(fontWeight: FontWeight.bold)),
-//                       Text('Brand ',
-//                           style: TextStyle(fontWeight: FontWeight.bold)),
-//                       Text('Price '),
-//                       Text('Miles'),
-//                     ],
-//                   ),
-//                 ],
-//               );
-//             }),
-//           )

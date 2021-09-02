@@ -1,4 +1,5 @@
 import 'package:find_stick/screens/auth_screen.dart';
+import 'package:find_stick/widgets/car_list.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 

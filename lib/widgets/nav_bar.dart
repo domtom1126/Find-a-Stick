@@ -14,7 +14,7 @@ class NavBar extends StatefulWidget {
 class _NavBarState extends State<NavBar> {
   int _selectedIndex = 0;
   final List<Widget> _children = [
-    // HomeScreen(),
+    HomeScreen(),
     PostScreen(),
     LikedScreen(),
     ProfileScreen(),
@@ -41,8 +41,12 @@ class _NavBarState extends State<NavBar> {
               label: 'Cars',
             ),
             new BottomNavigationBarItem(
+              icon: Icon(Icons.hdr_plus),
+              label: 'Post',
+            ),
+            new BottomNavigationBarItem(
               icon: Icon(Icons.message_sharp),
-              label: 'Messages',
+              label: 'Liked',
             ),
             new BottomNavigationBarItem(
                 icon: Icon(Icons.person), label: 'Profile')

@@ -13,32 +13,40 @@ class ListViewCars extends StatefulWidget {
 class _ListViewCarsState extends State<ListViewCars> {
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
+      child: Container(
         child: GridView.count(
-      crossAxisCount: 1,
-      children: List.generate(100, (index) {
-        return Column(
-          children: [
-            //  ? Scrollable gallery click to expand
-            Row(
-              children: [Text('gallery of car here')],
-            ),
-            Row(
-              children: [
-                IconButton(onPressed: null, icon: Icon(Icons.favorite)),
-              ],
-            ),
-            Row(
-              children: [
-                Text('Year ', style: TextStyle(fontWeight: FontWeight.bold)),
-                Text('Brand ', style: TextStyle(fontWeight: FontWeight.bold)),
-                Text('Price '),
-                Text('Miles'),
-              ],
-            ),
-          ],
-        );
-      }),
-    ));
+          crossAxisCount: 1,
+          children: List.generate(
+            100,
+            (index) {
+              return Column(
+                children: [
+                  //  ? Scrollable gallery click to expand
+                  Row(
+                    children: [Text('gallery of car here')],
+                  ),
+                  Row(
+                    children: [
+                      IconButton(onPressed: null, icon: Icon(Icons.favorite)),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Text('Year ',
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      Text('Brand ',
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      Text('Price '),
+                      Text('Miles'),
+                    ],
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+      ),
+    );
   }
 }
