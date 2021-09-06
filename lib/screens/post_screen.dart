@@ -1,4 +1,6 @@
+import 'package:find_stick/screens/form_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class PostScreen extends StatefulWidget {
   const PostScreen({Key? key}) : super(key: key);
@@ -14,12 +16,7 @@ class _PostScreenState extends State<PostScreen> {
       child: Row(
         children: [
           Expanded(
-            child: SizedBox(
-              child: TextField(
-                  decoration: InputDecoration(
-                hintText: 'Enter name',
-              )),
-            ),
+            child: PostForm(),
           ),
         ],
       ),
