@@ -39,7 +39,10 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>UIViewControllerBasedStatusBarAppearance</key>
-	<false/>
+	<!-- <key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/> -->
+	<!-- <key>NSPhotoLibraryUsageDescription</key>
+	<string>To chose a picture of a car</string>
+	<key>To take a picture of a car</key> -->
 </dict>
 </plist>
