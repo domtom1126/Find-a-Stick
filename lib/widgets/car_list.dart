@@ -35,13 +35,16 @@ class _CarListState extends State<CarList> {
       child: Container(
         child: Scaffold(
           appBar: AppBar(
+            backgroundColor: Colors.blueGrey,
             title: Text('Car List'),
             // todo navigate to messages page
             actions: [IconButton(onPressed: null, icon: Icon(Icons.message))],
           ),
+          // First page this navigates to is ListViewCars
           body: _children[_selectedIndex],
           bottomNavigationBar: BottomNavigationBar(
             type: BottomNavigationBarType.fixed,
+            selectedItemColor: Colors.orange[400],
             backgroundColor: Colors.blueGrey,
             onTap: _onItemTap,
             currentIndex: _selectedIndex,
