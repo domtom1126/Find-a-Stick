@@ -41,8 +41,7 @@
 	</array>
 	<!-- <key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/> -->
-	<!-- <key>NSPhotoLibraryUsageDescription</key>
-	<string>To chose a picture of a car</string>
-	<key>To take a picture of a car</key> -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Permission to access photo gallery</string>
 </dict>
 </plist>
