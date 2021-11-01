@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 
 Future<bool> signIn(String email, String password) async {
   try {
@@ -49,31 +50,6 @@ Future<bool> addCarToProfile(String id, String amount) async {
       // double newAmount = snapshot['Amount'] + value;
       // transaction.update(documentReference, {'Amount': newAmount});
       // return true;
-    });
-  } catch (e) {
-    return false;
-  }
-  return true;
-}
-
-Future<bool> addCarToPublic(String make, String model, String year,
-    String miles, String color, String price) async {
-  try {
-    DocumentReference documentReference =
-        FirebaseFirestore.instance.collection('Public').doc('users');
-    FirebaseFirestore.instance.runTransaction((transaction) async {
-      DocumentSnapshot snapshot = await transaction.get(documentReference);
-      if (!snapshot.exists) {
-        documentReference.set({
-          'Make': make,
-          'Model': model,
-          'Year': year,
-          'Miles': miles,
-          'Color': color,
-          'Price': price
-        });
-        return true;
-      }
     });
   } catch (e) {
     return false;
