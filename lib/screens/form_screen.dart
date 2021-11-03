@@ -4,6 +4,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:find_stick/screens/post_success_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/rendering.dart';
 import 'package:http/http.dart' as http;
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -22,6 +23,7 @@ class PostForm extends StatefulWidget {
 
 class _PostFormState extends State<PostForm> {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
+  FirebaseStorage storage = FirebaseStorage.instance;
   FirebaseAuth auth = FirebaseAuth.instance;
   // * Global Vars
   var showYear = '';
@@ -41,6 +43,7 @@ class _PostFormState extends State<PostForm> {
   final _formKey = GlobalKey<FormState>();
   List<XFile>? imageList = [];
   File? singleImage;
+  List<String> downloadedUrls = [];
   // * For picking multiple photos
 
   @override
@@ -121,7 +124,7 @@ class _PostFormState extends State<PostForm> {
               child: CupertinoButton(
                 color: Colors.orangeAccent,
                 onPressed: () async {
-                  pickSingleImage();
+                  uploadFiles();
                 },
                 child: Text('Add Photo'),
               ),
@@ -130,12 +133,12 @@ class _PostFormState extends State<PostForm> {
             // container to show image from imageList
             Container(
               height: 200,
-              child: imageList!.length == 0
+              child: downloadedUrls.length == 0
                   ? Center(
                       child: Text('No images selected'),
                     )
                   : CarouselSlider(
-                      items: imageList!.map((i) {
+                      items: downloadedUrls.map((i) {
                         return Builder(
                           builder: (BuildContext context) {
                             return Container(
@@ -144,8 +147,8 @@ class _PostFormState extends State<PostForm> {
                               decoration: BoxDecoration(
                                 color: Colors.transparent,
                               ),
-                              child:
-                                  Image.file(File(i.path), fit: BoxFit.cover),
+                              child: Image.file(File(i.toString()),
+                                  fit: BoxFit.cover),
                             );
                           },
                         );
@@ -243,12 +246,12 @@ class _PostFormState extends State<PostForm> {
                     style: TextStyle(fontSize: 20)),
               ])),
               CarouselSlider.builder(
-                itemCount: imageList!.length,
+                itemCount: downloadedUrls.length,
                 itemBuilder:
                     (BuildContext context, int index, int pageViewIndex) {
-                  if (imageList!.isNotEmpty) {
+                  if (downloadedUrls.isNotEmpty) {
                     return Container(
-                        child: Image.file(File(imageList![index].path)));
+                        child: Image.file(File(downloadedUrls[index])));
                   } else {
                     return Container(child: Text('hwllo'));
                   }
@@ -315,9 +318,42 @@ class _PostFormState extends State<PostForm> {
       maxWidth: 100,
       maxHeight: 100,
     );
+    var imageUrls = imageList!.map((i) {
+      return i.path;
+    }).toList();
     setState(() {
       // show image on screen after picking
       imageList!.addAll(pickedImage!);
     });
   }
+
+  Future<List<String>> uploadFiles() async {
+    List<XFile>? pickedImage = await ImagePicker().pickMultiImage(
+      maxWidth: 100,
+      maxHeight: 100,
+    );
+    List<String> urls = [];
+    for (var file in pickedImage!) {
+      XFile url = (file);
+      urls.add(url.path);
+      Reference reference = FirebaseStorage.instance.ref().child('images/');
+      for (var image in urls) {
+        await reference.putFile(File(image));
+        String downloadUrl = await reference.getDownloadURL();
+        downloadedUrls.add(downloadUrl);
+        print(downloadedUrls);
+      }
+    }
+    return urls;
+  }
+
+  // Future<String> uploadFile(File file) async {
+  //   String filePath = 'images/${DateTime.now().millisecondsSinceEpoch}.jpg';
+  //   Reference reference = FirebaseStorage.instance.ref().child(filePath);
+  //   UploadTask uploadTask = reference.putFile(file);
+  //   uploadTask.then((res) {
+  //     res.ref.getDownloadURL();
+  //   });
+  //   return filePath;
+  // }
 }
