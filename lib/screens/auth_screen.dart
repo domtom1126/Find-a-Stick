@@ -1,7 +1,7 @@
 import 'package:find_stick/screens/home_screen.dart';
-import 'package:find_stick/screens/register_screen.dart';
+// import 'package:find_stick/screens/register_screen.dart';
 import 'package:find_stick/services/auth.dart';
-import 'package:find_stick/widgets/car_list.dart';
+import 'package:find_stick/widgets/bottom_bar.dart';
 import 'package:flutter/material.dart';
 
 class Authentication extends StatefulWidget {
@@ -20,9 +20,11 @@ class _AuthenticationState extends State<Authentication> {
     return Scaffold(
         backgroundColor: Colors.blueGrey,
         appBar: AppBar(
-          backgroundColor: Colors.black45,
-          elevation: 0.0,
-          title: Text("Sign Up"),
+          backgroundColor: Colors.transparent,
+          title: Text(
+            'Find Stick',
+            style: TextStyle(fontSize: 25, fontFamily: 'InputSans'),
+          ),
         ),
         body: SafeArea(
           child: Center(
@@ -90,8 +92,7 @@ class _AuthenticationState extends State<Authentication> {
                       bool shouldNavigate =
                           await register(_emailField.text, _passwordField.text);
                       if (shouldNavigate) {
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (context) => CarList()));
+                        Navigator.pushReplacementNamed(context, '/home');
                       }
                     },
                     color: Colors.orange[400],
@@ -123,9 +124,7 @@ class _AuthenticationState extends State<Authentication> {
                     bool shouldNavigate =
                         await signIn(_emailField.text, _passwordField.text);
                     if (shouldNavigate) {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => CarList()));
-                      // MaterialPageRoute(builder: (context) => CarList()));
+                      Navigator.pushReplacementNamed(context, '/home');
                     }
                   },
                   color: Colors.orange[400],
