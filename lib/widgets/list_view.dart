@@ -7,6 +7,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:scroll_app_bar/scroll_app_bar.dart';
 
 class ListViewCars extends StatefulWidget {
   const ListViewCars({Key? key}) : super(key: key);
@@ -16,6 +17,9 @@ class ListViewCars extends StatefulWidget {
 }
 
 class _ListViewCarsState extends State<ListViewCars> {
+  final scrollController = ScrollController();
+  Set<String> _favCars = Set<String>();
+  // final images = FirebaseStorage.instance.ref().child('images');
   final cars = FirebaseFirestore.instance
       .collection('publicCars')
       .orderBy('dateAdded', descending: true)
@@ -25,109 +29,81 @@ class _ListViewCarsState extends State<ListViewCars> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // * Original appbar at the bottom
       appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.message),
-          onPressed: () {
-            // navigator material route
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => UserMessages(),
-              ),
-            );
-          },
-        ),
-        title: Text('Listings'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.search),
+            onPressed: () {
+              // This needs to go to the search page
+              showModalBottomSheet(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return SafeArea(
+                      child: Container(
+                        padding: EdgeInsets.all(20),
+                        child: Text('Search'),
+                      ),
+                    );
+                  });
+            },
+          ),
+        ],
+        title: Text('Find Stick'),
       ),
-      body: SizedBox(
-        height: MediaQuery.of(context).size.height,
-        child: Container(
-          child: StreamBuilder(
-              stream: cars,
-              builder: (BuildContext context,
-                  AsyncSnapshot<QuerySnapshot> snapshot) {
-                if (snapshot.hasData) {
-                  return ListView(
-                    children: snapshot.data!.docs.map((publicCar) {
-                      // * This is for each posting
-                      return ListTile(
-                        onTap: //* This is for each posting
-                            () {
-                          print('${publicCar['make']}');
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => SingleListingInfo(
-                                make: '${publicCar['make']}',
-                                model: '${publicCar['model']}',
-                                year: '${publicCar['year']}',
-                                trim: '${publicCar['trim']}',
-                                miles: '${publicCar['miles']}',
-                              ),
-                            ),
-                          );
-                        },
-                        title: Column(
-                          children: [
-                            // map each image in carousel_slider
-                            // CarouselSlider(
-                            //     options: CarouselOptions(
-                            //       height: 200,
-                            //       aspectRatio: 16 / 9,
-                            //       enlargeCenterPage: true,
-                            //       viewportFraction: 0.9,
-                            //       initialPage: 0,
-                            //       enableInfiniteScroll: true,
-                            //       reverse: false,
-                            //       scrollDirection: Axis.horizontal,
-                            //     ),
-                            //     items: [
-                            //       // * This is for each image in carousel_slider
-                            //       for (var image in publicCar['images'])
-                            //         Container(
-                            //             width:
-                            //                 MediaQuery.of(context).size.width,
-                            //             margin: EdgeInsets.symmetric(
-                            //                 horizontal: 5.0),
-                            //             child: ClipRRect(
-                            //                 borderRadius:
-                            //                     BorderRadius.circular(8.0),
-                            //                 child: Image.network(
-                            //                   image,
-                            //                   fit: BoxFit.cover,
-                            //                 )))
-                            //     ]),
-
-                            Text(
-                              '${publicCar['make']} ${publicCar['model']} ${publicCar['trim']}',
-                              style: TextStyle(color: Colors.white70),
-                            ),
-                          ],
-                        ),
-                        subtitle: Text(
-                            '${publicCar['year']} | ${publicCar['miles']} Miles'),
-                        trailing: // Like button to change color on click
-                            IconButton(
-                          icon: Icon(
-                            Icons.favorite,
-                            color: isLiked ? Colors.red : Colors.white,
+      body: StreamBuilder(
+          stream: cars,
+          builder:
+              (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+            if (snapshot.hasData) {
+              return ListView(
+                children: snapshot.data!.docs.map((publicCar) {
+                  // * This is for each posting
+                  return ListTile(
+                    onTap: //* This is for each posting
+                        () {
+                      print('${publicCar['make']}');
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SingleListingInfo(
+                            make: '${publicCar['make']}',
+                            model: '${publicCar['model']}',
+                            year: '${publicCar['year']}',
+                            trim: '${publicCar['trim']}',
+                            miles: '${publicCar['miles']}',
                           ),
-                          onPressed: () {
-                            setState(() {
-                              isLiked = !isLiked;
-                            });
-                          },
                         ),
                       );
-                    }).toList(),
+                    },
+                    title: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${publicCar['make']} ${publicCar['model']} ${publicCar['trim']}',
+                          style: TextStyle(color: Colors.white70, fontSize: 18),
+                        ),
+                      ],
+                    ),
+                    subtitle: Text(
+                        '${publicCar['year']} | ${publicCar['miles']} Miles'),
+                    trailing: // Like button to change color on click
+                        IconButton(
+                      icon: Icon(
+                        isLiked ? Icons.favorite : Icons.favorite_border,
+                        color: isLiked ? Colors.red : Colors.white,
+                      ),
+                      onPressed: () {
+                        setState(() {});
+                      },
+                    ),
                   );
-                } else {
-                  return Center(child: CircularProgressIndicator());
-                }
-              }),
-        ),
-      ),
+                }).toList(),
+              );
+            } else {
+              return Center(child: CircularProgressIndicator());
+            }
+          }),
     );
   }
 
@@ -136,3 +112,136 @@ class _ListViewCarsState extends State<ListViewCars> {
     null;
   }
 }
+// import 'dart:convert';
+
+// // import 'package:coingecko_dart/coingecko_dart.dart';
+// // import 'package:coingecko_dart/dataClasses/coins/Coin.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:find_stick/screens/each_car.dart';
+// import 'package:flutter/material.dart';
+// import 'package:http/http.dart' as http;
+
+// class AddCoin extends StatefulWidget {
+//   const AddCoin({Key? key}) : super(key: key);
+
+//   @override
+//   _AddCoinState createState() => _AddCoinState();
+// }
+
+// // CoinGeckoApi apiInstance = CoinGeckoApi();
+
+// class _AddCoinState extends State<AddCoin> {
+//   Set<String> _favCars = Set<String>();
+//   // final images = FirebaseStorage.instance.ref().child('images');
+//   final cars = FirebaseFirestore.instance
+//       .collection('publicCars')
+//       .orderBy('dateAdded', descending: true)
+//       .snapshots();
+//   // variable for liked button state
+//   bool isLiked = false;
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       // * Original appbar at the bottom
+//       appBar: AppBar(
+//         actions: [
+//           IconButton(
+//             icon: Icon(Icons.search),
+//             onPressed: () {
+//               // This needs to go to the search page
+//               showModalBottomSheet(
+//                   context: context,
+//                   builder: (BuildContext context) {
+//                     return SafeArea(
+//                       child: Container(
+//                         padding: EdgeInsets.all(20),
+//                         child: Text('Search'),
+//                       ),
+//                     );
+//                   });
+//             },
+//           ),
+//         ],
+//         title: Text('Find Stick'),
+//       ),
+//       body: StreamBuilder(
+//           stream: cars,
+//           builder:
+//               (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+//             if (snapshot.hasData) {
+//               return ListView(
+//                 children: snapshot.data!.docs.map((publicCar) {
+//                   // * This is for each posting
+//                   return ListTile(
+//                     onTap: //* This is for each posting
+//                         () {
+//                       print('${publicCar['make']}');
+//                       Navigator.push(
+//                         context,
+//                         MaterialPageRoute(
+//                           builder: (context) => SingleListingInfo(
+//                             make: '${publicCar['make']}',
+//                             model: '${publicCar['model']}',
+//                             year: '${publicCar['year']}',
+//                             trim: '${publicCar['trim']}',
+//                             miles: '${publicCar['miles']}',
+//                           ),
+//                         ),
+//                       );
+//                     },
+//                     title: Column(
+//                       children: [
+//                         Text(
+//                           '${publicCar['make']} ${publicCar['model']} ${publicCar['trim']}',
+//                           style: TextStyle(color: Colors.white70),
+//                         ),
+//                       ],
+//                     ),
+//                     subtitle: Text(
+//                         '${publicCar['year']} | ${publicCar['miles']} Miles'),
+//                     trailing: // Like button to change color on click
+//                         IconButton(
+//                       icon: Icon(
+//                         isLiked ? Icons.favorite : Icons.favorite_border,
+//                         color: isLiked ? Colors.red : Colors.white,
+//                       ),
+//                       onPressed: () {
+//                         setState(() {});
+//                       },
+//                     ),
+//                   );
+//                 }).toList(),
+//               );
+//             } else {
+//               return Center(child: CircularProgressIndicator());
+//             }
+//           }),
+//     );
+//   }
+
+// // * for like button
+//   Future<void> likedCar() async {
+//     null;
+//   }
+// }
+
+// AppBar(
+//         backgroundColor: Colors.transparent,
+//         leading: IconButton(
+//           icon: Icon(Icons.message),
+//           onPressed: () {
+//             // navigator material route
+//             Navigator.push(
+//               context,
+//               MaterialPageRoute(
+//                 builder: (context) => UserMessages(),
+//               ),
+//             );
+//           },
+//         ),
+//         title: Padding(
+//             padding: EdgeInsets.only(left: 16, right: 16),
+//             child: Text(
+//               'Listings',
+//             )),
+//       ),
