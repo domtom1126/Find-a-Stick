@@ -5,7 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:find_stick/screens/each_car.dart';
 import 'package:find_stick/screens/form_screen.dart';
 import 'package:find_stick/screens/user_messages.dart';
-import 'package:find_stick/widgets/image_gallery.dart';
+// import 'package:find_stick/widgets/image_gallery.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
