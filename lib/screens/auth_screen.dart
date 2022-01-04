@@ -1,8 +1,12 @@
+import 'package:find_stick/screens/create_account.dart';
 import 'package:find_stick/screens/home_screen.dart';
 // import 'package:find_stick/screens/register_screen.dart';
 import 'package:find_stick/services/auth.dart';
 import 'package:find_stick/widgets/bottom_bar.dart';
+import 'package:find_stick/widgets/list_view.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:hexcolor/hexcolor.dart';
 
 class Authentication extends StatefulWidget {
   const Authentication({Key? key}) : super(key: key);
@@ -14,11 +18,12 @@ class Authentication extends StatefulWidget {
 class _AuthenticationState extends State<Authentication> {
   TextEditingController _emailField = TextEditingController();
   TextEditingController _passwordField = TextEditingController();
+  TextEditingController _forgotEmailField = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.blueGrey,
+        // backgroundColor: Colors.blueGrey,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           title: Text(
@@ -35,7 +40,7 @@ class _AuthenticationState extends State<Authentication> {
                 width: 300,
                 child: Container(
                   child: Image.asset(
-                    'lib/images/R.png',
+                    'lib/images/R_2.png',
                   ),
                 ),
               ),
@@ -50,99 +55,101 @@ class _AuthenticationState extends State<Authentication> {
                         labelStyle: TextStyle(color: Colors.white70)),
                   )),
               Container(
-                  width: MediaQuery.of(context).size.width / 1.4,
-                  margin: EdgeInsets.symmetric(
-                    vertical: 10,
-                    horizontal: 50,
-                  ),
-                  child: TextFormField(
-                    controller: _passwordField,
-                    // textAlign: TextAlign.center,
-                    obscureText: true,
-                    enableSuggestions: false,
-                    autocorrect: false,
-                    decoration: InputDecoration(
-                        hintText: '',
-                        labelText: 'Password',
-                        labelStyle: TextStyle(color: Colors.white70)),
-                  )),
-              Container(
-                child: MaterialButton(
-                    onPressed: () async {
-                      // if the text fields are empty
-                      if (_emailField.text.isEmpty ||
-                          _passwordField.text.isEmpty) {
-                        return showDialog(
-                            context: context,
-                            builder: (context) {
-                              return AlertDialog(
-                                title: Text('Error'),
-                                content: Text('Please fill in all fields'),
-                                actions: <Widget>[
-                                  ElevatedButton(
-                                    child: Text('Ok'),
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                  )
-                                ],
-                              );
-                            });
-                      }
-                      bool shouldNavigate =
-                          await register(_emailField.text, _passwordField.text);
-                      if (shouldNavigate) {
-                        Navigator.pushReplacementNamed(context, '/home');
-                      }
-                    },
-                    color: Colors.orange[400],
-                    textColor: Colors.white,
-                    child: Text('Register')),
+                width: MediaQuery.of(context).size.width / 1.4,
+                margin: EdgeInsets.symmetric(
+                  vertical: 10,
+                  horizontal: 50,
+                ),
+                child: TextFormField(
+                  controller: _passwordField,
+                  // textAlign: TextAlign.center,
+                  obscureText: true,
+                  enableSuggestions: false,
+                  autocorrect: false,
+                  decoration: InputDecoration(
+                      hintText: '',
+                      labelText: 'Password',
+                      labelStyle: TextStyle(color: Colors.white70)),
+                ),
+              ),
+              SizedBox(
+                height: 10,
               ),
               Container(
-                child: MaterialButton(
-                  onPressed: () async {
-                    if (_emailField.text.isEmpty ||
-                        _passwordField.text.isEmpty) {
-                      return showDialog(
+                margin: EdgeInsets.only(bottom: 10),
+                child: TextButton(
+                    child: Text(
+                      'Forgot password?',
+                      style: TextStyle(color: HexColor('C9C9C9')),
+                    ),
+                    onPressed: () {
+                      showDialog(
                           context: context,
                           builder: (context) {
                             return AlertDialog(
-                              title: Text('Error'),
-                              content: Text('Please fill in all fields'),
-                              actions: <Widget>[
-                                ElevatedButton(
-                                  child: Text('Ok'),
+                              title: Text('Enter Email'),
+                              content: TextFormField(
+                                controller: _forgotEmailField,
+                                decoration: InputDecoration(
+                                    prefixIconColor: Colors.black,
+                                    hintText: 'something@gmail.com'),
+                              ),
+                              actions: [
+                                TextButton(
+                                  child: Text('Cancel'),
                                   onPressed: () {
                                     Navigator.of(context).pop();
                                   },
-                                )
+                                ),
+                                TextButton(
+                                  child: Text('Send'),
+                                  onPressed: () async {
+                                    await FirebaseAuth.instance
+                                        .sendPasswordResetEmail(
+                                            email: _forgotEmailField.text);
+                                  },
+                                ),
                               ],
                             );
                           });
-                    }
-                    bool shouldNavigate =
-                        await signIn(_emailField.text, _passwordField.text);
-                    if (shouldNavigate) {
-                      Navigator.pushReplacementNamed(context, '/home');
+                    }),
+              ),
+              Container(
+                child: ElevatedButton(
+                  onPressed: () async {
+                    if (_emailField.text.isNotEmpty &&
+                        _passwordField.text.isNotEmpty) {
+                      final bool isSuccess =
+                          await signIn(_emailField.text, _passwordField.text);
+                      if (isSuccess) {
+                        Navigator.pushReplacementNamed(context, '/home');
+                      } else {
+                        print('error');
+                      }
                     }
                   },
-                  color: Colors.orange[400],
-                  textColor: Colors.white,
-                  child: Text('Login'),
+                  child: Text(
+                    'Sign In',
+                  ),
                 ),
+              ),
+              SizedBox(
+                height: 20,
               ),
               new Expanded(
                 child: Divider(
-                  color: Colors.blueGrey,
-                ),
+                    // color: Colors.blueGrey,
+                    ),
               ),
               new Container(
                 child: MaterialButton(
                   onPressed: () {
-                    // button to send forgot Password to firebase
-                    // sendPasswordResetEmail(_emailField.text);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => CreateAccount()),
+                    );
                   },
+                  child: Text('Create Account'),
                 ),
               ),
             ]),
