@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:find_stick/main.dart';
 import 'package:find_stick/screens/auth_screen.dart';
-import 'package:find_stick/screens/edit_profile_screen.dart';
+import 'package:find_stick/services/database.dart';
+import 'package:hexcolor/hexcolor.dart';
+import 'package:provider/provider.dart';
 import 'package:find_stick/screens/settings_screen.dart';
 import 'package:find_stick/screens/user_listings.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -16,6 +18,10 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  final result = FirebaseFirestore.instance
+      .collection('users')
+      .where('userId', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+      .snapshots();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,17 +33,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 // show bottom modal sheet
                 showModalBottomSheet(
                   context: context,
-                  builder: (context) => EditProfile(),
+                  builder: (context) => SettingsScreen(),
                 );
               }),
         ],
+        bottom: PreferredSize(
+          child: Container(
+            color: HexColor('E07619'),
+            height: 2.0,
+          ),
+          preferredSize: Size.fromHeight(4.0),
+        ),
         title: Text('Profile'),
       ),
       body: SafeArea(
         child: Center(
           child: Column(
-            // mainAxisAlignment: MainAxisAlignment.center,
-            // crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Container(
                 margin: EdgeInsets.all(10),
@@ -49,49 +60,70 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   fallbackWidth: 25,
                 ),
               ),
-              SizedBox(height: 50),
-              SizedBox(
-                width: 250,
-                child: CupertinoButton(
-                  padding: EdgeInsets.all(15),
-                  color: Colors.orangeAccent,
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => UserListings()));
-                  },
-                  child: Text('Your Listings'),
-                ),
+              StreamBuilder<QuerySnapshot>(
+                stream: result,
+                builder: (BuildContext context,
+                    AsyncSnapshot<QuerySnapshot> snapshot) {
+                  if (snapshot.hasData) {
+                    return Column(
+                      children: snapshot.data!.docs.map((document) {
+                        return ListTile(
+                          title: Text(document['name'],
+                              style: TextStyle(
+                                fontSize: 20,
+                              ),
+                              textAlign: TextAlign.center),
+                          subtitle: Text(document['email'],
+                              style: TextStyle(
+                                fontSize: 15,
+                              ),
+                              textAlign: TextAlign.center),
+                        );
+                      }).toList(),
+                    );
+                  } else {
+                    return Text('Loading...');
+                  }
+                },
               ),
-              SizedBox(height: 50),
               SizedBox(
-                width: 250,
-                child: CupertinoButton(
-                  padding: EdgeInsets.all(15),
-                  color: Colors.orangeAccent,
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => SettingsScreen()));
-                  },
-                  child: Text('Settings'),
-                ),
+                height: 20,
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => SettingsScreen()));
+                },
+                child: Text('Edit Profile'),
+              ),
+              SizedBox(height: 40),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => UserListings()));
+                },
+                child: Text('Your Listings'),
+              ),
+              SizedBox(height: 40),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => SettingsScreen()));
+                },
+                child: Text('Settings'),
               ),
               new Expanded(
-                child: Divider(
-                  color: Colors.blueGrey,
-                ),
+                child: Divider(),
               ),
               new Container(
                 child: MaterialButton(
                   onPressed: () {
                     FirebaseAuth.instance.signOut();
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => Authentication()));
+                    Navigator.pushReplacementNamed(context, '/');
                   },
                   child: Text('Logout'),
                 ),
