@@ -28,7 +28,7 @@ class PostForm extends StatefulWidget {
 
 class _PostFormState extends State<PostForm> {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
-  // FirebaseAuth auth = FirebaseAuth.instance;
+  FirebaseAuth auth = FirebaseAuth.instance;
   // * Global Vars
   var showYear = '';
   var showMake = '';
@@ -182,7 +182,64 @@ class _PostFormState extends State<PostForm> {
                 margin: EdgeInsets.only(bottom: 20),
                 child: SizedBox(
                   child: ElevatedButton(
-                    onPressed: () => VinNumber(),
+                    onPressed: () async {
+                      if (vinNumber.text.isEmpty || inputYear.text.isEmpty) {
+                        return showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                title: Text('Error'),
+                                content: Text('Please fill in all fields'),
+                                actions: <Widget>[
+                                  ElevatedButton(
+                                    child: Text('OK'),
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                  )
+                                ],
+                              );
+                            });
+                      } else if (vinNumber.text.length != 17) {
+                        return showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                title: Text('Check the VIN number'),
+                                content:
+                                    Text('VIN needs to be 17 characters long'),
+                                actions: <Widget>[
+                                  ElevatedButton(
+                                    child: Text('OK'),
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                  )
+                                ],
+                              );
+                            });
+                      } else if (inputYear.text.length != 4) {
+                        return showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                title: Text('Check the year'),
+                                content:
+                                    Text('Year needs to be 4 characters long'),
+                                actions: <Widget>[
+                                  ElevatedButton(
+                                    child: Text('OK'),
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                  )
+                                ],
+                              );
+                            });
+                      } else {
+                        vinSearch(vinNumber, inputYear);
+                      }
+                    },
                     child: Text('Next'),
                   ),
                 ),
@@ -194,175 +251,156 @@ class _PostFormState extends State<PostForm> {
     );
   }
 
-  // Future<void> vinSearch(vin, year) async {
-  //   // check if text fiels are empty
-  //   if (vin.text.isEmpty || year.text.isEmpty) {
-  //     return showDialog(
-  //         context: context,
-  //         builder: (context) {
-  //           return AlertDialog(
-  //             title: Text('Error'),
-  //             content: Text('Please fill in all fields'),
-  //             actions: <Widget>[
-  //               ElevatedButton(
-  //                 child: Text('OK'),
-  //                 onPressed: () {
-  //                   Navigator.of(context).pop();
-  //                 },
-  //               )
-  //             ],
-  //           );
-  //         });
-  //   }
-  //   CollectionReference publicCars =
-  //       FirebaseFirestore.instance.collection('publicCars');
+  Future<void> vinSearch(vin, year) async {
+    CollectionReference publicCars =
+        FirebaseFirestore.instance.collection('publicCars');
 
-  //   var url = Uri.parse(
-  //       'https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVINValues/${vin.text}?format=json&modelyear=${year.text}');
-  //   var response = await http.get(url);
-  //   String data = response.body;
-  //   // * Gets the data from url. this data needs to go into firestore for user.
-  //   var make = jsonDecode(data)['Results'][0]['Make'];
-  //   var model = jsonDecode(data)['Results'][0]['Model'];
-  //   var jsonYear = jsonDecode(data)['Results'][0]['ModelYear'];
-  //   var trim = jsonDecode(data)['Results'][0]['Trim'];
-  //   var series = jsonDecode(data)['Results'][0]['Series'];
-  //   User? user = auth.currentUser;
-  //   final userUid = user!.uid;
-  //   bool isLiked = false;
-  //   setState(() {
-  //     showModalBottomSheet(
-  //         backgroundColor: HexColor('474747'),
-  //         shape: RoundedRectangleBorder(
-  //           borderRadius: BorderRadius.circular(10.0),
-  //         ),
-  //         // backgroundColor: Colors.blueGrey,
-  //         context: context,
-  //         builder: (context) {
-  //           return Container(
-  //             margin: EdgeInsets.all(20),
-  //             child: ListView(children: [
-  //               Text(
-  //                 'Is This Your Car?',
-  //                 style: TextStyle(
-  //                     fontSize: 40, fontFamily: 'Roboto', color: Colors.white),
-  //                 textAlign: TextAlign.center,
-  //               ),
-  //               Text(
-  //                 'Make sure everything is correct',
-  //                 textAlign: TextAlign.center,
-  //                 style: TextStyle(
-  //                   height: 1.5,
-  //                   fontSize: 15,
-  //                   fontWeight: FontWeight.bold,
-  //                   color: HexColor('CCCCCC'),
-  //                 ),
-  //               ),
-  //               Divider(
-  //                 color: Colors.white,
-  //               ),
-  //               Text('Vin Number', style: TextStyle(fontSize: 20, height: 3)),
-  //               TextFormField(
-  //                 onChanged: (val) {
-  //                   val = vin.text;
-  //                 },
-  //                 controller: vin,
-  //               ),
-  //               Text('Year',
-  //                   style: TextStyle(
-  //                     fontSize: 20,
-  //                     height: 2,
-  //                   )),
-  //               TextFormField(
-  //                 onChanged: (val) {
-  //                   val = year.text;
-  //                 },
-  //                 controller: year,
-  //               ),
-  //               Text('Make', style: TextStyle(fontSize: 20, height: 2)),
-  //               TextFormField(
-  //                 initialValue: StringUtils.capitalize('$make'),
-  //               ),
-  //               Text('Model', style: TextStyle(fontSize: 20, height: 2)),
-  //               TextFormField(
-  //                 initialValue: '$model',
-  //               ),
-  //               Text('Trim', style: TextStyle(fontSize: 20, height: 2)),
-  //               TextFormField(
-  //                 initialValue: '$trim',
-  //               ),
-  //               Text('Series', style: TextStyle(fontSize: 20, height: 2)),
-  //               TextFormField(
-  //                 initialValue: '$series',
-  //               ),
+    var url = Uri.parse(
+        'https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVINValues/${vin.text}?format=json&modelyear=${year.text}');
+    var response = await http.get(url);
+    String data = response.body;
+    // * Gets the data from url. this data needs to go into firestore for user.
+    var make = jsonDecode(data)['Results'][0]['Make'];
+    var model = jsonDecode(data)['Results'][0]['Model'];
+    var jsonYear = jsonDecode(data)['Results'][0]['ModelYear'];
+    var trim = jsonDecode(data)['Results'][0]['Trim'];
+    var series = jsonDecode(data)['Results'][0]['Series'];
+    User? user = auth.currentUser;
+    final userUid = user!.uid;
+    bool isLiked = false;
+    setState(() {
+      showModalBottomSheet(
+          backgroundColor: HexColor('474747'),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          // backgroundColor: Colors.blueGrey,
+          context: context,
+          builder: (context) {
+            return Container(
+              margin: EdgeInsets.all(20),
+              child: ListView(children: [
+                Text(
+                  'Is This Your Car?',
+                  style: TextStyle(
+                      fontSize: 40, fontFamily: 'Roboto', color: Colors.white),
+                  textAlign: TextAlign.center,
+                ),
+                Text(
+                  'Make sure everything is correct',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    height: 1.5,
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: HexColor('CCCCCC'),
+                  ),
+                ),
+                Divider(
+                  color: Colors.white,
+                ),
+                Text('Vin Number', style: TextStyle(fontSize: 20, height: 3)),
+                TextFormField(
+                  onChanged: (val) {
+                    val = vin.text;
+                  },
+                  controller: vin,
+                ),
+                Text('Year',
+                    style: TextStyle(
+                      fontSize: 20,
+                      height: 2,
+                    )),
+                TextFormField(
+                  onChanged: (val) {
+                    val = year.text;
+                  },
+                  controller: year,
+                ),
+                Text('Make', style: TextStyle(fontSize: 20, height: 2)),
+                TextFormField(
+                  initialValue: StringUtils.capitalize('$make'),
+                ),
+                Text('Model', style: TextStyle(fontSize: 20, height: 2)),
+                TextFormField(
+                  initialValue: '$model',
+                ),
+                Text('Trim', style: TextStyle(fontSize: 20, height: 2)),
+                TextFormField(
+                  initialValue: '$trim',
+                ),
+                Text('Series', style: TextStyle(fontSize: 20, height: 2)),
+                TextFormField(
+                  initialValue: '$series',
+                ),
 
-  //               Text('Images', style: TextStyle(fontSize: 20, height: 2)),
-  //               CarouselSlider.builder(
-  //                 itemCount: imageList!.length,
-  //                 itemBuilder:
-  //                     (BuildContext context, int index, int pageViewIndex) {
-  //                   if (imageList!.isNotEmpty) {
-  //                     return Container(
-  //                         child: Image.file(File(imageList![index].path)));
-  //                   } else {
-  //                     return Container(child: Text('hwllo'));
-  //                   }
-  //                 },
-  //                 options: CarouselOptions(viewportFraction: 0.75),
-  //               ),
-  //               // Text('$model, $trim'),
-  //               // * Posts to firebase
-  //               CupertinoButton(
-  //                   color: Colors.orangeAccent,
-  //                   child: Text('Add Car'),
-  //                   onPressed: () {
-  //                     if (_formKey.currentState!.validate()) {
-  //                       // firebase stuff
-  //                       publicCars.add({
-  //                         'year': jsonYear,
-  //                         'make': StringUtils.capitalize(make),
-  //                         'model': model,
-  //                         'trim': trim,
-  //                         'series': series,
-  //                         'miles': inputMiles.text,
-  //                         'price': inputPrice.text,
-  //                         'dateAdded': DateTime.now(),
-  //                         'userID': userUid,
-  //                         'description': inputDescription.text,
-  //                         'isLiked': isLiked,
-  //                         'images': imageList!.map((i) {
-  //                           return i.path;
-  //                         }).toList(),
-  //                       });
-  //                     }
-  //                     Navigator.push(
-  //                       context,
-  //                       MaterialPageRoute(
-  //                         builder: (context) => PostSuccess(
-  //                           make: '$make',
-  //                           model: '$model',
-  //                           trim: '$trim',
-  //                           series: series,
-  //                           year: jsonYear,
-  //                           miles: inputMiles.text,
-  //                           price: inputPrice.text,
-  //                           description: inputDescription.text,
-  //                           images: [
-  //                             imageList![0].path,
-  //                             imageList![1].path,
-  //                             imageList![2].path,
-  //                             imageList![3].path,
-  //                             imageList![4].path,
-  //                           ],
-  //                         ),
-  //                       ),
-  //                     );
-  //                   })
-  //             ]),
-  //           );
-  //         });
-  //   });
-  // }
+                Text('Images', style: TextStyle(fontSize: 20, height: 2)),
+                CarouselSlider.builder(
+                  itemCount: imageList!.length,
+                  itemBuilder:
+                      (BuildContext context, int index, int pageViewIndex) {
+                    if (imageList!.isNotEmpty) {
+                      return Container(
+                          child: Image.file(File(imageList![index].path)));
+                    } else {
+                      return Container(child: Text('hwllo'));
+                    }
+                  },
+                  options: CarouselOptions(viewportFraction: 0.75),
+                ),
+                // Text('$model, $trim'),
+                // * Posts to firebase
+                CupertinoButton(
+                    color: Colors.orangeAccent,
+                    child: Text('Add Car'),
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        // firebase stuff
+                        publicCars.add({
+                          'year': jsonYear,
+                          'make': StringUtils.capitalize(make),
+                          'model': model,
+                          'trim': trim,
+                          'series': series,
+                          'miles': inputMiles.text,
+                          'price': inputPrice.text,
+                          'dateAdded': DateTime.now(),
+                          'userID': userUid,
+                          'description': inputDescription.text,
+                          'isLiked': isLiked,
+                          'images': imageList!.map((i) {
+                            return i.path;
+                          }).toList(),
+                        });
+                      }
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PostSuccess(
+                            make: '$make',
+                            model: '$model',
+                            trim: '$trim',
+                            series: series,
+                            year: jsonYear,
+                            miles: inputMiles.text,
+                            price: inputPrice.text,
+                            description: inputDescription.text,
+                            // images: [
+                            //   imageList![0].path,
+                            //   imageList![1].path,
+                            //   imageList![2].path,
+                            //   imageList![3].path,
+                            //   imageList![4].path,
+                            // ],
+                          ),
+                        ),
+                      );
+                    })
+              ]),
+            );
+          });
+    });
+  }
 
   @override
   void dispose() {
