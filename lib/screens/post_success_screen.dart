@@ -1,6 +1,8 @@
 import 'dart:io';
 
+import 'package:basic_utils/basic_utils.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:find_stick/screens/user_messages.dart';
 import 'package:find_stick/widgets/bottom_bar.dart';
 import 'package:find_stick/widgets/list_view.dart';
@@ -19,6 +21,7 @@ class PostSuccess extends StatefulWidget {
   var price;
   var images;
   var description;
+  var userUid;
 
   PostSuccess(
       {Key? key,
@@ -29,8 +32,10 @@ class PostSuccess extends StatefulWidget {
       this.miles,
       this.price,
       this.description,
-      series,
-      required List<String> images})
+      this.series,
+      this.userUid
+      // required List<String> images
+      })
       : super(key: key);
 
   @override
@@ -38,6 +43,9 @@ class PostSuccess extends StatefulWidget {
 }
 
 class _PostSuccessState extends State<PostSuccess> {
+  final _formKey = GlobalKey<FormState>();
+  CollectionReference publicCars =
+      FirebaseFirestore.instance.collection('publicCars');
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,34 +56,34 @@ class _PostSuccessState extends State<PostSuccess> {
         Column(
           children: <Widget>[
             // CarouselSlider
-            CarouselSlider(
-              options: CarouselOptions(
-                height: 200.0,
-                autoPlay: true,
-                enlargeCenterPage: true,
-                aspectRatio: 2.0,
-                viewportFraction: 0.9,
-                initialPage: 0,
-                enableInfiniteScroll: true,
-                reverse: false,
-                autoPlayInterval: Duration(seconds: 3),
-                autoPlayAnimationDuration: Duration(milliseconds: 800),
-                autoPlayCurve: Curves.fastOutSlowIn,
-                // pauseAutoPlayOnTouch: Duration(seconds: 10),
-              ),
-              items: widget.images.map((url) {
-                return Container(
-                  margin: EdgeInsets.all(5.0),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                    child: Image.network(
-                      url,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
+            // CarouselSlider(
+            //   options: CarouselOptions(
+            //     height: 200.0,
+            //     autoPlay: true,
+            //     enlargeCenterPage: true,
+            //     aspectRatio: 2.0,
+            //     viewportFraction: 0.9,
+            //     initialPage: 0,
+            //     enableInfiniteScroll: true,
+            //     reverse: false,
+            //     autoPlayInterval: Duration(seconds: 3),
+            //     autoPlayAnimationDuration: Duration(milliseconds: 800),
+            //     autoPlayCurve: Curves.fastOutSlowIn,
+            //     // pauseAutoPlayOnTouch: Duration(seconds: 10),
+            //   ),
+            //   items: widget.images.map((url) {
+            //     return Container(
+            //       margin: EdgeInsets.all(5.0),
+            //       child: ClipRRect(
+            //         borderRadius: BorderRadius.all(Radius.circular(5.0)),
+            //         child: Image.network(
+            //           url,
+            //           fit: BoxFit.cover,
+            //         ),
+            //       ),
+            //     );
+            //   }).toList(),
+            // ),
             Container(
               child: ListTile(
                 contentPadding: EdgeInsets.only(left: 10),
@@ -122,6 +130,25 @@ class _PostSuccessState extends State<PostSuccess> {
               alignment: Alignment.bottomCenter,
               child: ElevatedButton(
                 onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    // firebase stuff
+                    publicCars.add({
+                      'year': widget.year,
+                      'make': StringUtils.capitalize(widget.make),
+                      'model': widget.model,
+                      'trim': widget.trim,
+                      'series': widget.series,
+                      'miles': widget.miles.text,
+                      'price': widget.price.text,
+                      'dateAdded': DateTime.now(),
+                      'userID': widget.userUid,
+                      'description': widget.description.text,
+                      // 'isLiked': isLiked,
+                      // 'images': imageList!.map((i) {
+                      //   return i.path;
+                      // }).toList(),
+                    });
+                  }
                   Navigator.popAndPushNamed(context, '/home');
                 },
                 child: const Text('Confirm Post'),
