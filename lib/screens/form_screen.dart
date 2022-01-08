@@ -73,6 +73,14 @@ class _PostFormState extends State<PostForm> {
               SizedBox(
                 height: 20,
               ),
+              Center(
+                  child: Text(
+                'Manual cars only!',
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold),
+              )),
               // * Enter vin number
               TextFormField(
                 onChanged: (val) {
@@ -258,6 +266,7 @@ class _PostFormState extends State<PostForm> {
     var url = Uri.parse(
         'https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVINValues/${vin.text}?format=json&modelyear=${year.text}');
     var response = await http.get(url);
+    print(response);
     String data = response.body;
     // * Gets the data from url. this data needs to go into firestore for user.
     var make = jsonDecode(data)['Results'][0]['Make'];
@@ -355,46 +364,30 @@ class _PostFormState extends State<PostForm> {
                     child: Text('Add Car'),
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
-                        // firebase stuff
-                        publicCars.add({
-                          'year': jsonYear,
-                          'make': StringUtils.capitalize(make),
-                          'model': model,
-                          'trim': trim,
-                          'series': series,
-                          'miles': inputMiles.text,
-                          'price': inputPrice.text,
-                          'dateAdded': DateTime.now(),
-                          'userID': userUid,
-                          'description': inputDescription.text,
-                          'isLiked': isLiked,
-                          'images': imageList!.map((i) {
-                            return i.path;
-                          }).toList(),
-                        });
-                      }
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => PostSuccess(
-                            make: '$make',
-                            model: '$model',
-                            trim: '$trim',
-                            series: series,
-                            year: jsonYear,
-                            miles: inputMiles.text,
-                            price: inputPrice.text,
-                            description: inputDescription.text,
-                            // images: [
-                            //   imageList![0].path,
-                            //   imageList![1].path,
-                            //   imageList![2].path,
-                            //   imageList![3].path,
-                            //   imageList![4].path,
-                            // ],
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PostSuccess(
+                              make: '$make',
+                              model: '$model',
+                              trim: '$trim',
+                              series: series,
+                              year: jsonYear,
+                              miles: inputMiles.text,
+                              price: inputPrice.text,
+                              description: inputDescription.text,
+                              userUid: userUid,
+                              // images: [
+                              //   imageList![0].path,
+                              //   imageList![1].path,
+                              //   imageList![2].path,
+                              //   imageList![3].path,
+                              //   imageList![4].path,
+                              // ],
+                            ),
                           ),
-                        ),
-                      );
+                        );
+                      }
                     })
               ]),
             );
