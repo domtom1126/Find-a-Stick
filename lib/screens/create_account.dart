@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:find_stick/services/auth.dart';
 import 'package:find_stick/services/database.dart';
 import 'package:find_stick/widgets/user_picked_image.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
@@ -15,6 +18,7 @@ class CreateAccount extends StatefulWidget {
 }
 
 class _CreateAccountState extends State<CreateAccount> {
+  final FirebaseStorage _storage = FirebaseStorage.instance;
   List<XFile>? _imageFileList;
   final ImagePicker _picker = ImagePicker();
   final TextEditingController inputUsername = new TextEditingController();
@@ -74,17 +78,7 @@ class _CreateAccountState extends State<CreateAccount> {
             ),
             ElevatedButton(
               onPressed: // imagepicker
-                  () async {
-                final pickedFile = await _picker.pickImage(
-                  source: ImageSource.gallery,
-                );
-                if (pickedFile != null) {
-                  setState(() {
-                    _imageFileList = [XFile(pickedFile.path)];
-                  });
-                }
-                // todo upload image to firebase (shared preferences)
-              },
+                  () => uploadProfilePicture(),
               child: Text('Choose Profile Picture'),
             ),
             SizedBox(
