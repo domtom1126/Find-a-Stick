@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:image_picker/image_picker.dart';
@@ -41,11 +42,15 @@ Future<void> uploadProfilePicture() async {
   // pickedFile needs to upload to firebase
   XFile file = XFile(pickedFile!.path);
   await _storage
-      .ref('/user_pictures')
+      .ref('/user_pictures/$file')
       .child(file.toString())
       .putFile(File(pickedFile.path));
 
   // get downloadUrl
+  String downloadedImage =
+      await _storage.ref('/user_pictures/$file').getDownloadURL();
+  print(downloadedImage);
   // store downloadUrl in shared preferences
+
   // todo upload image to firebase (shared preferences)
 }
