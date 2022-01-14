@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SingleListingInfo extends StatefulWidget {
   var make;
@@ -31,7 +32,9 @@ class SingleListingInfo extends StatefulWidget {
 
 class _SingleListingInfoState extends State<SingleListingInfo> {
   List<bool> _likes = List.filled(1, true);
-
+  String _emailUrl =
+      'mailto:domtom1126@gmail.com?subject=Id like to know more about your car! &body=This is the body';
+  String _textUrl = 'sms:<phone number>';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,14 +48,15 @@ class _SingleListingInfoState extends State<SingleListingInfo> {
                 Container(
                     margin: EdgeInsets.all(10),
                     child: Placeholder(fallbackHeight: 250)),
-
                 Container(
                     alignment: Alignment.centerLeft,
                     margin: EdgeInsets.only(left: 10, top: 10),
                     child: Text(
                       '${widget.price}',
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white),
                     )),
                 Container(
                   margin: EdgeInsets.only(top: 0, bottom: 15),
@@ -79,14 +83,6 @@ class _SingleListingInfoState extends State<SingleListingInfo> {
                   ),
                 ),
                 Container(
-                  margin: EdgeInsets.only(left: 10, bottom: 15),
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Description',
-                    style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                Container(
                   margin: EdgeInsets.only(
                     left: 10,
                     bottom: 25,
@@ -94,50 +90,48 @@ class _SingleListingInfoState extends State<SingleListingInfo> {
                   alignment: Alignment.centerLeft,
                   child: Text(
                     '${widget.description}',
-                    style: TextStyle(fontSize: 15),
+                    style: TextStyle(fontSize: 15, color: Colors.white),
                   ),
                 ),
-                // message input
-                Container(
-                  margin: EdgeInsets.all(10),
-                  child: Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: TextField(
-                          maxLines: 10,
-                          decoration: InputDecoration(
-                            hintText: 'Hi, I\'m interested in this car!',
-                            border: OutlineInputBorder(),
-                          ),
+                SizedBox(
+                  height: 20,
+                ),
+                // Send email button
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    SizedBox(
+                      width: 250,
+                      child: ElevatedButton(
+                        child: Text(
+                          'Send Email',
                         ),
+                        onPressed: () => _launchEmail(),
                       ),
-                      IconButton(
-                        icon: Icon(Icons.send),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => UserMessages()),
-                          );
-                        },
+                    ),
+                    SizedBox(height: 20),
+                    SizedBox(
+                      width: 250,
+                      child: ElevatedButton(
+                        child: Text(
+                          'Send Text',
+                        ),
+                        onPressed: () => _launchText(),
                       ),
-                      // IconButton(
-                      //   icon: Icon(Icons.send),
-                      //   onPressed: () {
-                      //     Navigator.push(
-                      //       context,
-                      //       MaterialPageRoute(
-                      //         builder: (context) => UserMessages(),
-                      //       ),
-                      //     );
-                      //   },
-                      // ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ],
             )
           ],
         ));
+  }
+
+  void _launchEmail() async {
+    if (!await launch(_emailUrl)) throw 'Could not launch $_emailUrl';
+  }
+
+  void _launchText() async {
+    if (!await launch(_textUrl)) throw 'Could not launch $_textUrl';
   }
 }
